@@ -1,0 +1,13 @@
+
+For a single AZ outage, the minimum RTO for this Multi-AZ, multi-region database will be approximately 60-120 seconds. For an SLA, I wouldn't go lower than 120 seconds.  In a single AZ outage, failover
+to a replica in another AZ is automatic, and the documentation states that failover times are typically 60-120 seconds.
+
+The minimum RPO is zero in this case as the replica is provisioned and maintained synchronously in a different AZ.  
+
+For a single region outage, failover to the read replica is not automatically handled by AWS but could be automated using a cloudwatch alarm on the primary database failure, SNS to trigger a lambda function to promote the read replica.
+I would prefer to test this DR strategy before determining the RTO since the distance and size of the db would be a factor.  However, it could be assumed that it will be longer than the AWS implemented
+automatic failover of 120 seconds.  With the cloudwatch - SNS - lambda approach, I would estimate a minimum RTO of about 5 minutes.
+
+For the cross region read replica the data is coppied asynchronously so could be a delay in replication of up to five minutes. Provided the previously described failover process was in place, I would use a minumum RPO of 5 minutes.
+ 
+
